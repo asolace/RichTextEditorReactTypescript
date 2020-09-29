@@ -1,21 +1,18 @@
-import React, { useState, useMemo, PropsWithChildren } from 'react';
+import React, { useState, useMemo, PropsWithChildren, useEffect } from 'react';
 import { Node } from 'slate';
 import { Slate } from 'slate-react';
 
 import createSlateEditor from './Plugins/createSlateEditor/createSlateEditor';
+import parseFormContent from './Utils/Parser';
 import initialMockValues from './initialSlateValues';
 import { getDeserializedPropsHtml } from './Utils/Deserialize';
-import FooterButtons from './Components/FooterButtons/FooterButtons';
 
 import { Box, makeStyles } from '@material-ui/core';
 
 export interface SlateProps {
   className?: string;
   initialValue?: string;
-  loading?: boolean;
-  submitBtnName?: string;
   parseFormat?: string;
-  handleCancel: () => void;
   handleFormData: (value: string) => void;
 }
 
@@ -34,10 +31,7 @@ const RichTextEditor = ({
   children,
   className,
   initialValue,
-  loading = false,
   parseFormat,
-  submitBtnName,
-  handleCancel,
   handleFormData,
 }: PropsWithChildren<SlateProps>) => {
   const InitialValue = initialValue
@@ -48,6 +42,10 @@ const RichTextEditor = ({
   const [value, setValue] = useState<Node[]>(InitialValue);
   const editor = useMemo(() => createSlateEditor(), []);
 
+  useEffect(() => {
+    parseFormContent(parseFormat, value, handleFormData)
+  })
+
   return (
     <Box
       className={`${classes.wrapper} ${className}`}
@@ -57,18 +55,11 @@ const RichTextEditor = ({
         id="slate-editor"
         editor={editor}
         value={value}
-        onChange={(newValue) => setValue(newValue)}
+        onChange={newValue => setValue(newValue)}
       >
+
         {children}
 
-        <FooterButtons
-          loading={loading}
-          parseFormat={parseFormat}
-          submitBtnName={submitBtnName}
-          value={value}
-          handleCancel={handleCancel}
-          handleFormData={handleFormData}
-        />
       </Slate>
     </Box>
   );
