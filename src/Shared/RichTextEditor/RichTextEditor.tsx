@@ -34,7 +34,7 @@ const RichTextEditor = ({
   children,
   className,
   initialValue,
-  loading,
+  loading = false,
   parseFormat,
   submitBtnName,
   handleCancel,
@@ -47,8 +47,6 @@ const RichTextEditor = ({
   const classes = useStyles();
   const [value, setValue] = useState<Node[]>(InitialValue);
   const editor = useMemo(() => createSlateEditor(), []);
-
-  loading = loading ? loading : false;
 
   return (
     <Box
