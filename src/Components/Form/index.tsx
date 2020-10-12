@@ -16,11 +16,6 @@ const features = {
 
 const Form = () => {
   const [value, setvalue] = useState<string>()
-
-  const handleFormData = (data: string) => {
-    const stringData = data.toString();
-    setvalue(stringData)
-  };
   
   const handleSend = () => {
     console.log("--- SEND() ---")
@@ -36,13 +31,13 @@ const Form = () => {
       <h4>Form</h4>
 
       <RichTextEditor
-        handleFormData={handleFormData}
+        onChange={setvalue}
         initialValue={String(initialMockValues.fullHtmlString)}
         parseFormat="html"
       >
         <HoveringToolbar features={features} />
         <SlateToolbar features={features} />
-        <SlateEditable loading={true} />
+        <SlateEditable loading={false} onEnterSubmit={handleSend}/>
         <Counters />
       </RichTextEditor>
 
@@ -52,6 +47,12 @@ const Form = () => {
         onClick={handleSend}
       >
         Send
+      </Button>
+
+      <Button 
+        onClick={handleCancel}
+      >
+        Cancel
       </Button>
     </>
   );

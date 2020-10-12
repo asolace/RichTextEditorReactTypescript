@@ -9,12 +9,41 @@ const LIST_TYPES = ['numbered-list', 'bulleted-list'];
  *
  * @returns {string}
  */
-export const capitalize = (text: string) => {
+export const capitalize = (text: string): string => {
   return text
     .toLowerCase()
     .split(' ')
     .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
     .join(' ');
+};
+
+/**
+ * Pressing delete on an empty list item should break out of list
+ * and create a new line.
+ * 
+ * @param editor 
+ * 
+ * @returns {boolean}
+ */
+export const checkListBlock = (editor: Editor): boolean => {
+  if (!isBlockListType(editor)) return false;
+  
+  // Offset of anchor and focus at 0 means the cursor is at the beginning.
+  const anchorOffset = editor.selection?.anchor.offset;
+  const focusOffset = editor.selection?.focus.offset;
+
+  if (anchorOffset === 0 && focusOffset === 0) {
+    Transforms.unwrapNodes(editor, {
+      match: (n) => LIST_TYPES.includes(n.type as string),
+      split: true,
+    });
+
+    Transforms.setNodes(editor, {
+      type: 'paragraph',
+    });
+  };
+
+  return true;
 };
 
 /**
@@ -29,6 +58,21 @@ export const capitalize = (text: string) => {
 export const isBlockActive = (editor: Editor, format: string) => {
   const [match] = Editor.nodes(editor, {
     match: (n) => n.type === format,
+  });
+
+  return !!match;
+};
+
+/**
+ * Checks if block is a list.
+ * List includes: [Bulleted List, Numbered List].
+ * 
+ * @param editor 
+ * @param format 
+ */
+export const isBlockListType = (editor: Editor) => {
+  const [match] = Editor.nodes(editor, {
+    match: n => n.type === 'numbered-list' || n.type === 'bulleted-list',
   });
 
   return !!match;
@@ -59,6 +103,27 @@ export const isMarkActive = (editor: Editor, format: string) => {
 export const isLinkActive = (editor: Editor) => {
   const [link] = Editor.nodes(editor, { match: (n) => n.type === 'link' });
   return !!link;
+};
+
+/**
+ * Creates a new line.
+ * 
+ * @param editor 
+ * @param event 
+ */
+export const newLine = (editor: Editor, event?: React.KeyboardEvent<HTMLDivElement>) => {
+  event?.preventDefault();
+
+  const newLine = {
+    type: "paragraph",
+    children: [
+        {
+            text: "",
+        }
+    ]
+  };
+
+  Transforms.insertNodes(editor, newLine);
 };
 
 /**

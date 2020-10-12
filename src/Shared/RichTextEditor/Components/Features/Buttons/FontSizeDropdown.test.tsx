@@ -9,12 +9,7 @@ describe('>> Font Size Button <<', () => {
 
   beforeEach(() => {
     wrapper = mount(
-      <RichTextEditor
-        handleFormData={jest.fn}
-        handleCancel={jest.fn}
-        submitBtnName="Send"
-        parseFormat="json"
-      >
+      <RichTextEditor onChange={jest.fn} parseFormat='html'>
         <SlateToolbar />
         <SlateEditable />
       </RichTextEditor>
